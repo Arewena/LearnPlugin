@@ -1,0 +1,4 @@
+name: LearnPlugin
+main: io.github.arewena.pluginMain
+version: 1.0
+api-version: 1.20
