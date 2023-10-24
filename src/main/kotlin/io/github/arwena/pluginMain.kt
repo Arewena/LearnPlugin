@@ -1,5 +1,6 @@
 package io.github.arwena
 
+import io.github.monun.kommand.kommand
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
@@ -23,9 +24,22 @@ import org.bukkit.scheduler.BukkitScheduler
 
 class pluginMain : JavaPlugin(), Listener { //Listener is needed when using EventHandler
     override fun onEnable() {
-        //Do Something
+
+
+        kommand()
         setupRecipe()
         server.pluginManager.registerEvents(this, this) //Essential to use EventHandler
+    }
+
+
+    fun kommand() {
+        kommand {
+            register("ping") {
+                executes {
+                    sender.sendMessage("pong")
+                }
+            }
+        }
     }
 
 
