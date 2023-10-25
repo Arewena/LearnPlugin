@@ -1,8 +1,11 @@
 package io.github.arwena
 
+import io.github.monun.kommand.getValue
 import io.github.monun.kommand.kommand
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.title.Title
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -34,9 +37,39 @@ class pluginMain : JavaPlugin(), Listener { //Listener is needed when using Even
 
     fun kommand() {
         kommand {
+            //Type 1
             register("ping") {
                 executes {
                     sender.sendMessage("pong")
+                }
+            }
+            //Type 2
+            register("a") {
+                requires { sender.isOp }
+                executes { sender.sendMessage("b") }
+            }
+            //Type 3
+            register("T1") {
+                then("fighting") {
+                    executes {
+                        //코드 참조: https://github.com/monun/series-survival/blob/master/src/main/kotlin/com/github/monun/survival/Bio.kt
+                        val title = Title.title(
+                            text("T1 Fighting").color(NamedTextColor.RED).decorate(TextDecoration.BOLD),
+                            text("LCK Fighting")
+                        )
+
+                        Bukkit.getServer().showTitle(title)
+                    }
+                }
+            }
+
+            //Type 4
+            register("LCK") {
+                then("team" to string()) {
+                    executes {
+                        val team: String by it
+                        sender.sendMessage("LCK $team Fighting")
+                    }
                 }
             }
         }
