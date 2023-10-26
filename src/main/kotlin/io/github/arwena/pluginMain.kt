@@ -6,10 +6,10 @@ import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.title.Title
-import org.bukkit.Bukkit
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
+import org.bukkit.*
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -72,7 +72,24 @@ class pluginMain : JavaPlugin(), Listener { //Listener is needed when using Even
                     }
                 }
             }
+            register("firework") {
+                requires { sender is Player }
+                executes {
+                    val sender = sender as Player
+                    val location = sender.location
+                    val world = location.world
+
+                    world.spawn(location, ArmorStand::class.java).apply {
+                        customName = "Firework!"
+                        isCustomNameVisible = true
+                        isInvisible = true
+                        setGravity(false)
+                        isInvulnerable = true
+                    }
+                }
+            }
         }
+
     }
 
 
