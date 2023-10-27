@@ -1,33 +1,38 @@
 package io.github.arwena
 
+import com.google.common.base.Ticker
 import io.github.monun.kommand.getValue
 import io.github.monun.kommand.kommand
+import io.github.monun.tap.fake.FakeEntity
+import io.github.monun.tap.fake.FakeEntityServer
+import io.github.monun.tap.fake.FakeSkinParts
+import io.github.monun.tap.mojangapi.MojangAPI
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.title.Title
 import org.bukkit.*
-import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
-import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ShapedRecipe
-import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.scheduler.BukkitScheduler
+
 
 class pluginMain : JavaPlugin(), Listener { //Listener is needed when using EventHandler
-    override fun onEnable() {
+    lateinit var fakeServer: FakeEntityServer // To make public
+        private set
 
+    override fun onEnable() {
+        fakeServer = FakeEntityServer.create(this)
+        server.scheduler.runTaskTimer(this, fakeServer::update, 0L, 1L)
 
         kommand()
         setupRecipe()
@@ -79,6 +84,8 @@ class pluginMain : JavaPlugin(), Listener { //Listener is needed when using Even
                     val location = sender.location
                     val world = location.world
 
+
+
                     world.spawn(location, ArmorStand::class.java).apply {
                         customName = "Firework!"
                         isCustomNameVisible = true
@@ -86,6 +93,17 @@ class pluginMain : JavaPlugin(), Listener { //Listener is needed when using Even
                         setGravity(false)
                         isInvulnerable = true
                     }
+                }
+            }
+            register("spawn") {
+                requires { sender is Player }
+                executes {
+                    val sender = sender as Player
+                    val uuid = MojangAPI.fetchProfile("Heptagram")!!.uuid()
+                    val profiles = MojangAPI.fetchSkinProfile(uuid)!!.profileProperties()
+
+                    val fakeEntity: FakeEntity<Player> = fakeServer.spawnPlayer(sender.location, "Heptagram",
+                        profiles.toSet(), FakeSkinParts(0b1111111))
                 }
             }
         }
@@ -133,10 +151,11 @@ class pluginMain : JavaPlugin(), Listener { //Listener is needed when using Even
         if (!event.player.isOp) {
             event.isCancelled = true
 
+
             val scheduler = Bukkit.getScheduler().runTaskTimer(this,
                 Runnable {
                     event.player.sendMessage("It is not able to Teleport!")
-                }, 10L, 0L)
+                }, 20L, 0L)
         }
 
     }
