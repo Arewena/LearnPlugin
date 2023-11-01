@@ -1,12 +1,12 @@
 package io.github.arwena
 
-import com.google.common.base.Ticker
 import io.github.monun.kommand.getValue
 import io.github.monun.kommand.kommand
 import io.github.monun.tap.fake.FakeEntity
 import io.github.monun.tap.fake.FakeEntityServer
 import io.github.monun.tap.fake.FakeSkinParts
 import io.github.monun.tap.mojangapi.MojangAPI
+import io.github.monun.tap.task.Ticker
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
@@ -33,7 +33,10 @@ class pluginMain : JavaPlugin(), Listener { //Listener is needed when using Even
     override fun onEnable() {
         fakeServer = FakeEntityServer.create(this)
         server.scheduler.runTaskTimer(this, fakeServer::update, 0L, 1L)
-
+// 알수없는 에러 원인 찾아봐야됨..
+//        val ticker: Ticker
+//        ticker.runTask(Runnable {  }, 0L) 한번 실행함
+//        ticker.runTaskTimer(Runnable { logger.info("SKT") }, 0L, 200L) // 계속 실행함
         kommand()
         setupRecipe()
         server.pluginManager.registerEvents(this, this) //Essential to use EventHandler
@@ -140,6 +143,7 @@ class pluginMain : JavaPlugin(), Listener { //Listener is needed when using Even
 
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
+
         // Run when player join
         val sender = event.player
         event.joinMessage(text("${sender.name} joined game").color(NamedTextColor.AQUA))
